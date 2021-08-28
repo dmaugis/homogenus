@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2019 Max-Planck-Gesellschaft zur Förderung der Wissenschaften e.V. (MPG),
+# Copyright (C) 2019 Max-Planck-Gesellschaft zur Fà¸£à¸–rderung der Wissenschaften e.V. (MPG),
 # acting on behalf of its Max Planck Institute for Intelligent Systems and the
 # Max Planck Institute for Biological Cybernetics. All rights reserved.
 #
-# Max-Planck-Gesellschaft zur Förderung der Wissenschaften e.V. (MPG) is holder of all proprietary rights
+# Max-Planck-Gesellschaft zur Fà¸£à¸–rderung der Wissenschaften e.V. (MPG) is holder of all proprietary rights
 # on this computer program. You can only use this computer program if you have closed a license agreement
 # with MPG or you get the right to use the computer program from someone who is authorized to grant you that right.
 # Any use of the computer program without a valid license is prohibited and liable to prosecution.
@@ -107,11 +107,14 @@ class Homogenus_infer(object):
             img_ext = im_basename.split('.')[-1]
             openpose_in_fname = os.path.join(openpose_indir, im_basename.replace('.%s'%img_ext, '_keypoints.json'))
             
-            with open(openpose_in_fname, 'r') as f: pose_data = json.load(f)
-
+            try:
+                with open(openpose_in_fname, 'r') as f: pose_data = json.load(f)
+            except:
+                print('error opening: ',openpose_in_fname)
+                continue
             im_orig = cv2.imread(im_fname, 3)[:,:,::-1].copy()
             for opnpose_pIdx in range(len(pose_data['people'])):
-                pose_data['people'][opnpose_pIdx]['gender_pd'] = 'neutral'
+                pose_data['people'][opnpose_pIdx]['homogenus'] = 'neutral'
 
                 pose = np.asarray(pose_data['people'][opnpose_pIdx]['pose_keypoints_2d']).reshape(-1, 3)
                 if not should_accept_pose(pose, human_prob_thr=0.5): continue
@@ -129,8 +132,13 @@ class Homogenus_infer(object):
                 gender_pd = 'male' if gender_id == 0 else 'female'
 
                 if gender_prob>accept_threshold:
-                    color = 'green'
-                    text = 'pred:%s[%.3f]' % (gender_pd, gender_prob)
+                    if gender_pd == 'male':
+                        color = 'blue'  # old habits die hard
+                    elif gender_pd == 'female':
+                        color = 'pink'  # old habits die hard
+                    else:
+                        color = 'green'                        
+                    text = 'pred:%s[%.3f]' % (gender_pd, gender_prob)                       
                 else:
                     text = 'thr:%s_pred:%s[%.3f]' % ('neutral', gender_pd, gender_prob)
                     gender_pd = 'neutral'
@@ -143,9 +151,11 @@ class Homogenus_infer(object):
                 im_orig = cv2.rectangle(im_orig, (x1, y1), (x2, y2), fontColors[color], 2)
                 im_orig = put_text_in_image(im_orig, [text], color, (x1, y1))[0]
 
+                pose_data['people'][opnpose_pIdx]['homogenus'] = gender_pd
                 pose_data['people'][opnpose_pIdx]['gender_pd'] = gender_pd
 
-                sys.stdout.write('%s -- peron_id %d --> %s\n'%(im_fname, opnpose_pIdx, gender_pd))
+                # corrected typo
+                sys.stdout.write('%s -- person n° %d --> %s\n'%(im_fname, opnpose_pIdx, gender_pd))
 
             if images_outdir != None:
                 save_images(im_orig, images_outdir, [os.path.basename(im_fname)])

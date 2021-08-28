@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2019 Max-Planck-Gesellschaft zur Förderung der Wissenschaften e.V. (MPG),
+# Copyright (C) 2019 Max-Planck-Gesellschaft zur Fรถrderung der Wissenschaften e.V. (MPG),
 # acting on behalf of its Max Planck Institute for Intelligent Systems and the
 # Max Planck Institute for Biological Cybernetics. All rights reserved.
 #
-# Max-Planck-Gesellschaft zur Förderung der Wissenschaften e.V. (MPG) is holder of all proprietary rights
+# Max-Planck-Gesellschaft zur Fรถrderung der Wissenschaften e.V. (MPG) is holder of all proprietary rights
 # on this computer program. You can only use this computer program if you have closed a license agreement
 # with MPG or you get the right to use the computer program from someone who is authorized to grant you that right.
 # Any use of the computer program without a valid license is prohibited and liable to prosecution.
@@ -30,6 +30,7 @@ fontColors = {'red': (255, 0, 0),
               'black': (0, 0, 0),
               'grey': (169, 169, 169),
               'white': (255, 255, 255),
+              'pink': (255,20,147)
               }
 
 def crop_to_bounding_box(image, offset_height, offset_width, target_height, target_width):
